@@ -1,0 +1,207 @@
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+
+MDScreen:
+    MDNavigationLayout:
+        ScreenManager:
+            id: screen_manager
+            transition: NoTransition()
+        
+        MDNavigationDrawer:
+            id: navigation_menu
+            anchor: "right"
+
+            ScrollView:
+                MDList:
+                    id: navigation_menu_list
+                    
+                    TwoLineAvatarListItem:
+                        text: app.loc.get("Spotify search")
+                        secondary_text: app.loc.get("Saved songs will have tags")
+                        on_press:
+                            app.navigation_menu.set_state("close")
+                            app.screen_switch("SpotifyScreen")
+                        
+                        IconLeftWidget:
+                            icon: "magnify"
+                    TwoLineAvatarListItem:
+                        text: app.loc.get("YouTube search")
+                        secondary_text: app.loc.get("Saved songs won't have tags")
+                        on_press:
+                            app.navigation_menu.set_state("close")
+                            app.screen_switch("YouTubeScreen")
+                        
+                        IconLeftWidget:
+                            icon: "magnify"
+                    
+                    OneLineAvatarListItem:
+                        text: app.loc.get("Spotify playlist")
+                        on_press:
+                            app.navigation_menu.set_state("close")
+                            app.screen_switch("SPlaylistScreen")
+                        
+                        IconLeftWidget:
+                            icon: "playlist-music"
+                    
+                    OneLineAvatarListItem:
+                        text: app.loc.get("YouTube playlist")
+                        on_press:
+                            app.navigation_menu.set_state("close")
+                            app.screen_switch("YPlaylistScreen")
+                        
+                        IconLeftWidget:
+                            icon: "playlist-music"
+                    
+                    OneLineAvatarListItem:
+                        text: app.loc.get("Settings")
+                        on_press:
+                            app.navigation_menu.set_state("close")
+                            app.screen_switch("SettingsScreen")
+                        
+                        IconLeftWidget:
+                            icon: "cog"
+
+<SpotifyScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDBoxLayout:
+            orientation: "vertical"
+            adaptive_height: True
+            spacing: 4
+        
+            MDTopAppBar:
+                id: toolbar
+                title: app.loc.TITLE
+                right_action_items: [["menu", lambda x: app.navigation_menu.set_state("open")]]
+            
+            MDProgressBar:
+                id: progressbar
+                color: app.theme_cls.accent_dark
+    
+        MDTabs:
+            id: tabs
+            tab_indicator_type: "round"
+            tab_hint_x: True
+            on_tab_switch: app.on_tab_switch(*args)
+            
+            ArtistsTab:
+                id: artists_tab
+                title: app.loc.get("[b]Artists[/b]")
+            AlbumsTab:
+                id: albums_tab
+                title: app.loc.get("[b]Albums[/b]")
+            TracksTab:
+                id: tracks_tab
+                title: app.loc.get("[b]Tracks[/b]")
+
+<ArtistsTab>:
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: 25
+
+        MDGridLayout:
+            cols: 1
+            size_hint: 1, 0.1
+            spacing: 15
+            padding: 15
+
+            MDTextField:
+                id: text_artists_search
+                hint_text: app.loc.get("Search singers/bands")
+                font_size: "26sp"
+                on_text_validate: app.load_in_thread(app.artists_load, app.artists_show)
+
+        ScrollView:
+            MDList:
+                id: mdlist_artists
+
+<AlbumsTab>:
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: 25
+
+        MDGridLayout:
+            cols: 1
+            size_hint: 1, 0.1
+            spacing: 15
+            padding: 15
+
+            MDTextField:
+                id: text_albums_search
+                hint_text: app.loc.get("Search albums")
+                font_size: "26sp"
+                on_text_validate: app.load_in_thread(app.albums_load, app.albums_show)
+
+        ScrollView:
+            id: scrollview
+            
+            MDList:
+                id: mdlist_albums
+
+<TracksTab>:
+    MDBoxLayout:
+        orientation: "vertical"
+        spacing: 25
+
+        MDGridLayout:
+            cols: 1
+            size_hint: 1, 0.1
+            spacing: 15
+            padding: 15
+
+            MDTextField:
+                id: text_tracks_search
+                hint_text: app.loc.get("Search tracks")
+                font_size: "26sp"
+                on_text_validate: app.load_in_thread(app.tracks_load, app.tracks_show)
+
+        ScrollView:
+            id: scrollview
+            
+            MDSelectionListFix:
+                id: mdlist_tracks
+                on_selected: app.mdlist_selected(*args)
+                on_unselected: app.mdlist_unselected(*args)
+                on_selected_mode: app.mdlist_set_mode(*args)
+                
+        MDBoxLayout:
+            id: tracks_actions
+            orientation: "horizontal"
+            adaptive_height: True
+            adaptive_width: True
+            pos_hint: {"center_x": .5}
+            spacing: 5
+            padding: [15, 5]
+            opacity: 0
+            
+            MDFillRoundFlatIconButton:
+                text: app.loc.get("Cancel")
+                icon: "close"
+                on_press: app.mdlist_set_mode(root.ids.mdlist_tracks, 0)
+            
+            MDFillRoundFlatIconButton:
+                text:  app.loc.get("All")
+                icon: "download-multiple"
+                on_press: app.tracks_actions("download_all")
+            
+            MDFillRoundFlatIconButton:
+                text: app.loc.get("Only selected")
+                icon: "download"
+                on_press: app.tracks_actions("download_selected")
+
+<Loading>:
+    MDSpinner:
+        pos_hint: {"center_x": .5, "center_y": .5}
+        size_hint: 1.0, None
+        line_width: dp(6)
+        active: True
+    
+    MDLabel:
+        id: label_loading_info
+        pos_hint: {"center_x": .5, "center_y": .5}
+        size_hint: 0.25, None
+        haling: "center"
+        text: ""
+        font_style: "H4"
+        theme_text_color: "Custom"
+        text_color: app.theme_cls.primary_color
