@@ -41,6 +41,12 @@ jobs:
           command: pip3 install sh==1.14.2; buildozer android debug
           workdir: neodeemer
 
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v3
+        with:
+          path: .buildozer_global
+          key: buildozer-global-${{ hashFiles('neodeemer/buildozer.spec') }}
+
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
