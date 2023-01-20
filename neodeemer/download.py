@@ -84,7 +84,8 @@ class Download():
                 except:
                     pass
             mtag.save()
-        except:
+        except Exception as e:
+            print(str(e))
             self.track_dict["state"] = TrackStates.FOUND
         else:
             self.track_dict["state"] = TrackStates.COMPLETED
@@ -129,7 +130,8 @@ class Download():
         self.track_dict["state"] = TrackStates.DOWNLOADING
         try:
             youtube_video.download(self.track_dict["folder_path"], file_name)
-        except:
+        except Exception as e:
+            print(str(e))
             self.download_file(youtube_video.url, self.track_dict["file_path"])
         self.track_dict["state"] = TrackStates.SAVED
     
@@ -181,12 +183,14 @@ class Download():
                 except:
                     try:
                         self.download_m4a_pytube()
-                    except:
+                    except Exception as e:
+                        print(str(e))
                         self.track_dict["forcedmp3"] = True
             else:
                 try:
                     self.download_mp3_neodeemer()
-                except:
+                except Exception as e:
+                    print(str(e))
                     self.download_mp3_vevioz()
         if self.track_dict["state"] == TrackStates.SAVED:
             self.save_tags()
