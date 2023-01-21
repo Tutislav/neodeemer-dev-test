@@ -177,7 +177,7 @@ class Download():
         if self.track_dict["state"] == TrackStates.UNKNOWN and self.track_dict["video_id"] == None:
             self.spotifyloader.track_find_video_id(self.track_dict)
         if self.track_dict["state"] == TrackStates.FOUND:
-            print(self.track_dict["state"] + " - " + self.track_dict["video_id"])
+            print(str(self.track_dict["state"]) + " - " + self.track_dict["video_id"])
             if not self.track_dict["forcedmp3"]:
                 try:
                     self.download_m4a_youtube_dl()
