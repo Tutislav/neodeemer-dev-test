@@ -34,6 +34,12 @@ jobs:
           path: .buildozer_global
           key: buildozer-global-${{ hashFiles('neodeemer/buildozer.spec') }}
 
+      - name: Cache Buildozer local directory
+        uses: actions/cache@v3
+        with:
+          path: neodeemer/.buildozer
+          key: buildozer-local-${{ hashFiles('neodeemer/buildozer.spec') }}
+
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1.1.3
         id: buildozer
