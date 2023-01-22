@@ -129,7 +129,7 @@ class Download():
         self.total_b_add(int(youtube_video.filesize))
         self.track_dict["state"] = TrackStates.DOWNLOADING
         try:
-            youtube_video.download(self.track_dict["folder_path"], file_name)
+            youtube_video.download(self.track_dict["folder_path"], file_name, max_retries=5)
         except Exception as e:
             print("download_m4a_pytube (IN) - " + str(e))
             self.download_file(youtube_video.url, self.track_dict["file_path"])
