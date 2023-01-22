@@ -36,7 +36,7 @@ orientation = portrait
 fullscreen = 0
 
 # (list) Permissions
-android.permissions = INTERNET, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 
 # (int) Target Android API, should be as high as possible.
 android.api = 29
