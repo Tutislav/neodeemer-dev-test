@@ -44,6 +44,9 @@ android.api = 29
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 21
 
+# (str) Android NDK version to use
+android.ndk = 19b
+
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
 
@@ -53,6 +56,9 @@ android.archs = arm64-v8a, armeabi-v7a
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
+
+# (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
+p4a.commit = 227a765
 
 # (str) Filename to the hook for p4a
 p4a.hook = p4a/hook.py
