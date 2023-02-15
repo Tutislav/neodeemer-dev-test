@@ -7,8 +7,6 @@ from threading import Thread
 from time import sleep
 
 import certifi
-from oscpy.server import OSCThreadServer
-from oscpy.client import OSCClient
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
@@ -102,11 +100,6 @@ class SettingsScreen(Screen):
 class ErrorScreen(Screen):
     pass
 
-SERVICE_NAME = u'{packagename}.Service{servicename}'.format(
-    packagename=u'cz.tutislav.neodeemer',
-    servicename=u'Download'
-)
-
 class Neodeemer(MDApp):
     icon = "data/icon.png"
     loc = Localization()
@@ -185,61 +178,6 @@ class Neodeemer(MDApp):
                 MDFlatButton(text=self.loc.get("Cancel"), on_press=lambda x:self.submit_bug_dialog.dismiss())
             ]
         )
-        self.service = None
-        self.start_service()
-
-        self.server = server = OSCThreadServer(encoding='utf8')
-        server.listen(
-            address=b'localhost',
-            port=3002,
-            default=True,
-        )
-
-        #server.bind(b'/message', self.display_message)
-        #server.bind(b'/date', self.date)
-
-        self.client = OSCClient(b'localhost', 3000, encoding='utf8')
-    def start_service(self):
-        if platform == 'android':
-            from jnius import autoclass
-            service = autoclass(SERVICE_NAME)
-            self.mActivity = autoclass(u'org.kivy.android.PythonActivity').mActivity
-            argument = ''
-            service.start(self.mActivity, argument)
-            self.service = service
-
-        elif platform in ('linux', 'linux2', 'macos', 'win'):
-            from runpy import run_path
-            from threading import Thread
-            self.service = Thread(
-                target=run_path,
-                args=['neodeemer/services/download.py'],
-                kwargs={'run_name': '__main__'},
-                daemon=True
-            )
-            self.service.start()
-        else:
-            raise NotImplementedError(
-                "service start not implemented on this platform"
-            )
-
-    def stop_service(self):
-        if self.service:
-            if platform == "android":
-                self.service.stop(self.mActivity)
-            elif platform in ('linux', 'linux2', 'macos', 'win'):
-                # The below method will not work. 
-                # Need to develop a method like 
-                # https://www.oreilly.com/library/view/python-cookbook/0596001673/ch06s03.html
-                self.service.stop()
-            else:
-                raise NotImplementedError(
-                    "service start not implemented on this platform"
-                )
-            self.service = None
-
-    def send(self, *args):
-        self.client.send_message(b'/add', json.dumps(self.download_queue, default=str))
     
     def screen_switch(self, screen_name, direction="left"):
         if not self.screen_manager.has_screen(screen_name):
@@ -490,11 +428,10 @@ class Neodeemer(MDApp):
         else:
             mdlist_tracks = self.screen_cur.ids.mdlist_tracks
         self.mdlist_set_mode(mdlist_tracks, 0)
-        #for i in range(1, 6):
-        #    if not globals()[f"download_tracks_{i}"].is_alive():
-        #        globals()[f"download_tracks_{i}"] = Thread(target=self.download_tracks_from_queue, name=f"download_tracks_{i}")
-        #        globals()[f"download_tracks_{i}"].start()
-        self.send()
+        for i in range(1, 6):
+            if not globals()[f"download_tracks_{i}"].is_alive():
+                globals()[f"download_tracks_{i}"] = Thread(target=self.download_tracks_from_queue, name=f"download_tracks_{i}")
+                globals()[f"download_tracks_{i}"].start()
         if not self.watchdog.is_alive():
             self.watchdog = Thread(target=self.watchdog_progress, name="watchdog")
             self.watchdog.start()
