@@ -34,7 +34,7 @@ jobs:
           python -m pip install -r neodeemer/requirements.txt
           cd
           set "workdir=%cd%"
-          for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do cd "%%i"
+          for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do cd /D "%%i"
           cd
           cd yt_dlp\extractor\
           mkdir ..\temp\
