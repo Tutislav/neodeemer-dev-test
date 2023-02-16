@@ -55,7 +55,7 @@ jobs:
             mkdir ../temp/;
             mv __init__.py _extractors.py extractors.py youtube.py ../temp/;
             rm -r *; cd ../temp/; mv __init__.py _extractors.py extractors.py youtube.py ../extractor/;
-            pip3 install sh==1.14.2; cd ~/neodeemer/; buildozer android debug
+            pip3 install sh==1.14.2; cd ~/neodeemer/; pwd; buildozer android debug
           workdir: neodeemer
 
       - name: Upload a Build Artifact
