@@ -45,7 +45,17 @@ jobs:
         id: buildozer
         with:
           command: >
-            pwd; buildozer android debug
+            pip3 install yt_dlp --upgrade --target ~/neodeemer/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/armeabi-v7a/;
+            pip3 install yt_dlp --upgrade --target ~/neodeemer/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/;
+            cd ~/neodeemer/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/armeabi-v7a/yt_dlp/extractor/;
+            mkdir ../temp/;
+            mv __init__.py _extractors.py extractors.py youtube.py ../temp/;
+            rm -r *; cd ../temp/; mv __init__.py _extractors.py extractors.py youtube.py ../extractor/;
+            cd ~/neodeemer/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/yt_dlp/extractor/;
+            mkdir ../temp/;
+            mv __init__.py _extractors.py extractors.py youtube.py ../temp/;
+            rm -r *; cd ../temp/; mv __init__.py _extractors.py extractors.py youtube.py ../extractor/;
+            pip3 install sh==1.14.2; cd /github/workspace/neodeemer; pwd; ls; buildozer android debug
           workdir: neodeemer
 
       - name: Upload a Build Artifact
