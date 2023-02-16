@@ -49,12 +49,12 @@ jobs:
             pip3 install yt_dlp --no-dependencies --target /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/;
             cd /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/armeabi-v7a/yt_dlp/extractor/;
             mkdir ../temp/;
-            mv __init__.py _extractors.py adobepass.py common.py extractors.py youtube.py ../temp/;
-            rm -r *; cd ../temp/; echo "$(head -n 26 _extractors.py)" > _extractors.py; mv __init__.py _extractors.py adobepass.py common.py extractors.py youtube.py ../extractor/;
+            mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py generic.py extractors.py openload.py youtube.py ../temp/;
+            rm -r *; cd ../temp/; echo "$(head -n 26 _extractors.py)" > _extractors.py; mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py generic.py extractors.py openload.py youtube.py ../extractor/;
             cd /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/yt_dlp/extractor/;
             mkdir ../temp/;
-            mv __init__.py _extractors.py adobepass.py common.py extractors.py youtube.py ../temp/;
-            rm -r *; cd ../temp/; echo "$(head -n 26 _extractors.py)" > _extractors.py; mv __init__.py _extractors.py adobepass.py common.py extractors.py youtube.py ../extractor/;
+            mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py generic.py extractors.py openload.py youtube.py ../temp/;
+            rm -r *; cd ../temp/; echo "$(head -n 26 _extractors.py)" > _extractors.py; mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py generic.py extractors.py openload.py youtube.py ../extractor/;
             pip3 install sh==1.14.2; cd /github/workspace/neodeemer; buildozer android debug
           workdir: neodeemer
 
