@@ -48,11 +48,13 @@ jobs:
             pip3 install yt_dlp --upgrade --target ~/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/armeabi-v7a/;
             pip3 install yt_dlp --upgrade --target ~/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/;
             cd ~/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/armeabi-v7a/yt_dlp/extractor/;
+            mkdir ../__pycache__/;
             mv __init__.py _extractors.py extractors.py youtube.py ../__pycache__/;
-            rm *; cd ../__pycache__/; mv __init__.py _extractors.py extractors.py youtube.py ../extractors/;
+            rm -r *; cd ../__pycache__/; mv __init__.py _extractors.py extractors.py youtube.py ../extractors/;
             cd ~/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/arm64-v8a/yt_dlp/extractor/;
+            mkdir ../__pycache__/;
             mv __init__.py _extractors.py extractors.py youtube.py ../__pycache__/;
-            rm *; cd ../__pycache__/; mv __init__.py _extractors.py extractors.py youtube.py ../extractors/;
+            rm -r *; cd ../__pycache__/; mv __init__.py _extractors.py extractors.py youtube.py ../extractors/;
             pip3 install sh==1.14.2; buildozer android debug
           workdir: neodeemer
 
