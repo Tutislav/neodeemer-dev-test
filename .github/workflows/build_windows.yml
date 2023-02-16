@@ -39,8 +39,8 @@ jobs:
           move __init__.py ..\temp\ && move _extractors.py ..\temp\ && move adobepass.py ..\temp\ && move common.py ..\temp\ && move commonmistakes.py ..\temp\ && move commonprotocols.py ..\temp\ && move generic.py ..\temp\ && move extractors.py ..\temp\ && move openload.py ..\temp\ && move youtube.py ..\temp\
           del /S /Q *
           cd ..\temp\
-          move __init__.py ..\extractor\ && move _extractors.py ..\extractor\ && move adobepass.py ..\extractor\ && move common.py ..\extractor\ && move commonmistakes.py ..\temp\ && move commonprotocols.py ..\temp\ && move generic.py ..\temp\ && move extractors.py ..\temp\ && move openload.py ..\temp\ && move youtube.py ..\extractor\
-          dir ..\extractor\
+          powershell -c "gc _extractors.py | select -first 26" > _extractors.py
+          move __init__.py ..\extractor\ && move _extractors.py ..\extractor\ && move adobepass.py ..\extractor\ && move common.py ..\extractor\ && move commonmistakes.py ..\extractor\ && move commonprotocols.py ..\extractor\ && move generic.py ..\extractor\ && move extractors.py ..\extractor\ && move openload.py ..\extractor\ && move youtube.py ..\extractor\
           cd %workdir%
           curl -L https://downloads.fdossena.com/geth.php?r=mesa64-latest --output mesa.7z
           7z e mesa.7z opengl32.dll -o"neodeemer"
