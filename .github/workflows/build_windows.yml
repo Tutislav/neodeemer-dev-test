@@ -41,6 +41,7 @@ jobs:
           move __init__.py ..\temp\ && move _extractors.py ..\temp\ && move extractors.py ..\temp\ && move youtube.py ..\temp\
           del /S /Q *
           cd ..\temp\
+          powershell -c "gc _extractors.py | select -first 26" > _extractors.py
           move __init__.py ..\extractor\ && move _extractors.py ..\extractor\ && move extractors.py ..\extractor\ && move youtube.py ..\extractor\
           dir ..\extractor\
           cd
