@@ -36,7 +36,7 @@ jobs:
           set "workdir=%cd%"
           for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do echo "%%i"
           cd
-          cd yt_dlp/extractor/
+          cd yt_dlp\extractor\
           mkdir ..\temp\
           move __init__.py ..\temp\ && move _extractors.py ..\temp\ && move extractors.py ..\temp\ && move youtube.py ..\temp\
           del /S *
