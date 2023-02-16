@@ -34,12 +34,12 @@ jobs:
           python -m pip install -r neodeemer/requirements.txt
           cd
           set "workdir=%cd%"
-          for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do echo "%%i"
+          for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do cd "%%i"
           cd
           cd yt_dlp\extractor\
           mkdir ..\temp\
           move __init__.py ..\temp\ && move _extractors.py ..\temp\ && move extractors.py ..\temp\ && move youtube.py ..\temp\
-          del /S *
+          del /S /Q *
           cd ..\temp\
           move __init__.py ..\extractor\ && move _extractors.py ..\extractor\ && move extractors.py ..\extractor\ && move youtube.py ..\extractor\
           dir ..\extractor\
