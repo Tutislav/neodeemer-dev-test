@@ -33,8 +33,19 @@ jobs:
           python -m pip install pyinstaller==5.3
           python -m pip install -r neodeemer/requirements.txt
           cd
-          for /f "delims=" %i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do echo "%i"
-          
+          set "workdir=%cd%"
+          for /f "delims=" %%i in ('python -c "import sysconfig; print(sysconfig.get_path('purelib'))"') do echo "%%i"
+          cd
+          cd yt_dlp/extractor/
+          mkdir ..\temp\
+          move __init__.py ..\temp\ && move _extractors.py ..\temp\ && move extractors.py ..\temp\ && move youtube.py ..\temp\
+          del /S *
+          cd ..\temp\
+          move __init__.py ..\extractor\ && move _extractors.py ..\extractor\ && move extractors.py ..\extractor\ && move youtube.py ..\extractor\
+          dir ..\extractor\
+          cd
+          cd %workdir%
+          cd
           curl -L https://downloads.fdossena.com/geth.php?r=mesa64-latest --output mesa.7z
           7z e mesa.7z opengl32.dll -o"neodeemer"
 
