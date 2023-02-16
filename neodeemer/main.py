@@ -137,6 +137,18 @@ class Neodeemer(MDApp):
         self.albums_tab = self.screen_cur.ids.albums_tab
         self.tracks_tab = self.screen_cur.ids.tracks_tab
         self.file_manager = MDFileManager(exit_manager=self.file_manager_close, select_path=self.file_manager_select)
+        if platform == "android":
+            from android.storage import primary_external_storage_path
+            from android.permissions import Permission, request_permissions
+            self.settings_folder_path = os.path.join(primary_external_storage_path(), app.loc.TITLE)
+            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS])
+        else:
+            self.settings_folder_path = app.user_data_dir
+        self.settings_file_path = os.path.join(self.settings_folder_path, "settings.json")
+        try:
+            app.settings_load()
+        except OSError as e:
+            print(str(e))
         if not os.path.exists(self.settings_folder_path):
             try:
                 os.makedirs(self.settings_folder_path)
@@ -791,16 +803,4 @@ if __name__ == "__main__":
             import ctypes
             ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 6)
     app = Neodeemer()
-    if platform == "android":
-        from android.storage import primary_external_storage_path
-        from android.permissions import Permission, request_permissions
-        settings_folder_path = os.path.join(primary_external_storage_path(), app.loc.TITLE)
-        request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS])
-    else:
-        settings_folder_path = app.user_data_dir
-    app.settings_file_path = os.path.join(settings_folder_path, "settings.json")
-    try:
-        app.settings_load()
-    except OSError as e:
-        print(str(e))
     app.run()
