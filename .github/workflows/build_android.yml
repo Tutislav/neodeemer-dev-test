@@ -53,11 +53,12 @@ jobs:
               cd yt_dlp/extractor/;
               mkdir ../temp/;
               mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../temp/;
-              rm -r *; cd ../temp/;
+              rm -r *;
+              cd ../temp/;
               echo "$(head -n 26 _extractors.py)" > _extractors.py;
-              echo from .commonmistakes import CommonMistakesIE, UnicodeBOMIE >> _extractors.py
-              echo from .commonprotocols import MmsIE, RtmpIE, ViewSourceIE >> _extractors.py
-              echo from .generic import GenericIE >> _extractors.py
+              echo from .commonmistakes import CommonMistakesIE, UnicodeBOMIE >> _extractors.py;
+              echo from .commonprotocols import MmsIE, RtmpIE, ViewSourceIE >> _extractors.py;
+              echo from .generic import GenericIE >> _extractors.py;
               mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../extractor/;
             done;
             pip3 install sh==1.14.2; cd /github/workspace/neodeemer/; buildozer android debug
