@@ -47,7 +47,7 @@ jobs:
           command: >
             cd /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/;
             for path in armeabi-v7a arm64-v8a;
-            do;
+            do
               cd $path;
               pip3 install yt_dlp --no-dependencies --target ./;
               cd yt_dlp/extractor/;
@@ -59,9 +59,10 @@ jobs:
               echo from .commonmistakes import CommonMistakesIE, UnicodeBOMIE >> _extractors.py;
               echo from .commonprotocols import MmsIE, RtmpIE, ViewSourceIE >> _extractors.py;
               echo from .generic import GenericIE >> _extractors.py;
-              mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../extractor/;
+              mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../extractor/
             done;
-            pip3 install sh==1.14.2; cd /github/workspace/neodeemer/; buildozer android debug
+            cd /github/workspace/neodeemer/;
+            pip3 install sh==1.14.2; buildozer android debug
           workdir: neodeemer
 
       - name: Upload a Build Artifact
