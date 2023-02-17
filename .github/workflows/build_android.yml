@@ -45,9 +45,11 @@ jobs:
         id: buildozer
         with:
           command: >
+            mkdir -p /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/;
             cd /github/workspace/neodeemer/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs/neodeemer/;
             for path in armeabi-v7a arm64-v8a;
             do
+              mkdir $path;
               cd $path;
               pip3 install yt_dlp --no-dependencies --target ./;
               cd yt_dlp/extractor/;
