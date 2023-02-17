@@ -61,7 +61,9 @@ jobs:
               echo from .commonmistakes import CommonMistakesIE, UnicodeBOMIE >> _extractors.py;
               echo from .commonprotocols import MmsIE, RtmpIE, ViewSourceIE >> _extractors.py;
               echo from .generic import GenericIE >> _extractors.py;
-              mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../extractor/
+              mv __init__.py _extractors.py adobepass.py common.py commonmistakes.py commonprotocols.py extractors.py generic.py lazy_extractors.py openload.py youtube.py ../extractor/;
+              rmdir ../temp/;
+              cd ../../../
             done;
             cd /github/workspace/neodeemer/;
             pip3 install sh==1.14.2; buildozer android debug
