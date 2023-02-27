@@ -10,8 +10,13 @@ CZ = {
     "Downloaded ": "Staženo ",
     " songs": " skladeb",
     " songs can't be downloaded": " skladeb se nepodařilo stáhnout",
+    "Error while loading artists": "Chyba při načítání interpretů",
+    "Error while loading albums": "Chyba při načítání alb",
+    "Error while loading tracks": "Chyba při načítání skladeb",
+    "Error while loading playlist": "Chyba při načítání playlistu",
     "Error while playing track": "Chyba při přehrávání skladby",
     "Not available on YouTube": "Není na YouTube",
+    "Error while downloading": "Chyba při stahování",
     #navigation_menu
     "Spotify search": "Vyhledávání na Spotify",
     "Saved songs will have tags": "Hudba se zařadí do alb",
@@ -43,6 +48,9 @@ CZ = {
     "Show": "Zobrazit",
     #SettingsScreen
     "Format": "Formát",
+    "Download lyrics": "Stahovat texty",
+    "Unsynchronized lyrics": "Nesynchronizované texty",
+    "Synchronized lyrics": "Synchronizované texty",
     "Create subfolders": "Vytvářet podsložky",
     "Music folder": "Složka, do které se ukládá hudba",
     "Choose folder": "Vybrat složku",
@@ -62,7 +70,7 @@ class Localization():
     }
 
     def __init__(self):
-        self.lang = "en-US"
+        self.lang = "en_US"
         if platform == "android":
             from jnius import autoclass
             javalocale = autoclass("java.util.Locale")

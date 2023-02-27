@@ -37,9 +37,9 @@ from download import Download
 from localization import Localization
 from songinfoloader import SpotifyLoader, YoutubeLoader
 from tools import (TrackStates, check_update_available, open_url, submit_bugs,
-                   track_file_state)
+                   check_mp3_available)
 
-__version__ = "0.4"
+__version__ = "0.5"
 
 class Loading(MDFloatLayout):
     pass
@@ -71,28 +71,23 @@ class SpotifyScreen(Screen):
 
 class ArtistsTab(MDBoxLayout, MDTabsBase):
     tab_name = "ArtistsTab"
-    pass
 
 class AlbumsTab(MDBoxLayout, MDTabsBase):
     tab_name = "AlbumsTab"
     page = 1
-    pass
 
 class TracksTab(MDBoxLayout, MDTabsBase):
     tab_name = "TracksTab"
     page = 1
-    pass
 
 class YouTubeScreen(Screen):
     pass
 
 class SPlaylistScreen(Screen):
     page = 1
-    pass
 
 class YPlaylistScreen(Screen):
     page = 1
-    pass
 
 class SettingsScreen(Screen):
     pass
@@ -105,6 +100,8 @@ class Neodeemer(MDApp):
     loc = Localization()
     format_mp3 = False
     create_subfolders = True
+    save_lyrics = True
+    synchronized_lyrics = False
     selected_tracks = []
     download_queue = []
     download_queue_info = {
@@ -139,32 +136,12 @@ class Neodeemer(MDApp):
         self.file_manager = MDFileManager(exit_manager=self.file_manager_close, select_path=self.file_manager_select)
         if platform == "android":
             from android.storage import primary_external_storage_path
-            from android.permissions import Permission, request_permissions
-            self.settings_folder_path = os.path.join(primary_external_storage_path(), app.loc.TITLE)
-            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS])
-        else:
-            self.settings_folder_path = app.user_data_dir
-        self.settings_file_path = os.path.join(self.settings_folder_path, "settings.json")
-        try:
-            app.settings_load()
-        except OSError as e:
-            print(str(e))
-        if not os.path.exists(self.settings_folder_path):
-            try:
-                os.makedirs(self.settings_folder_path)
-            except OSError as e:
-                print(str(e))        
-        try:
-            app.settings_load()
-        except OSError as e:
-            print(str(e))
-        if platform == "android":
-            from android.storage import primary_external_storage_path
             try:
                 self.music_folder_path
             except:
                 self.music_folder_path = os.path.join(primary_external_storage_path(), "Music")
             self.file_manager_default_path = primary_external_storage_path()
+            self.download_threads_count = 2
         else:
             try:
                 self.music_folder_path
@@ -174,6 +151,7 @@ class Neodeemer(MDApp):
                     path = self.user_data_dir
                 self.music_folder_path = path
             self.file_manager_default_path = os.path.expanduser("~")
+            self.download_threads_count = 5
         Clock.schedule_once(self.after_start, 2)
         self.tab_switch(self.tracks_tab)
         return
@@ -185,7 +163,7 @@ class Neodeemer(MDApp):
         self.y = YoutubeLoader(self.music_folder_path, self.format_mp3, self.create_subfolders, self.label_loading_info)
         self.watchdog = Thread()
         self.play_track = Thread()
-        for i in range(1, 6):
+        for i in range(1, self.download_threads_count + 1):
             globals()[f"download_tracks_{i}"] = Thread()
         self.navigation_menu_list = self.root.ids.navigation_menu_list
         if check_update_available(__version__):
@@ -218,8 +196,11 @@ class Neodeemer(MDApp):
             elif screen_name == "SettingsScreen":
                 if not hasattr(self, "localization_menu"):
                     self.switch_format = screen.ids.switch_format
-                    self.check_create_subfolders = screen.ids.check_create_subfolders
+                    self.switch_create_subfolders = screen.ids.switch_create_subfolders
                     self.text_music_folder_path = screen.ids.text_music_folder_path
+                    self.switch_save_lyrics = screen.ids.switch_save_lyrics
+                    self.options_lyrics = screen.ids.options_lyrics
+                    self.switch_lyrics_type = screen.ids.switch_lyrics_type
                     self.text_localization = screen.ids.text_localization
                     self.localization_menu_list = [
                         {
@@ -264,6 +245,7 @@ class Neodeemer(MDApp):
         if len(artists) > 0:
             return True
         else:
+            Clock.schedule_once(partial(self.snackbar_show, self.loc.get("Error while loading artists")))
             return False
     
     def artists_show(self, *args):
@@ -272,7 +254,12 @@ class Neodeemer(MDApp):
         mdlist_artists.clear_widgets()
         for artist in artists:
             if len(artist["artist_genres"]) > 0:
-                secondary_text = str(artist["artist_genres"])
+                genres = ""
+                for i, genre in enumerate(artist["artist_genres"]):
+                    genres += genre
+                    if i < (len(artist["artist_genres"]) - 1):
+                        genres += ", "
+                secondary_text = genres
             else:
                 secondary_text = " "
             line = ListLineArtist(text=artist["artist_name"], secondary_text=secondary_text, artist_dict=artist, on_press=lambda widget:self.load_in_thread(self.albums_load, self.albums_show, widget.artist_dict))
@@ -293,6 +280,7 @@ class Neodeemer(MDApp):
         if len(albums) > 0:
             return True
         else:
+            Clock.schedule_once(partial(self.snackbar_show, self.loc.get("Error while loading albums")))
             return False
     
     def albums_show(self, *args):
@@ -329,6 +317,7 @@ class Neodeemer(MDApp):
         if len(tracks) > 0:
             return True
         else:
+            Clock.schedule_once(partial(self.snackbar_show, self.loc.get("Error while loading tracks")))
             return False
     
     def tracks_show(self, *args):
@@ -365,6 +354,7 @@ class Neodeemer(MDApp):
         if len(tracks) > 0:
             return True
         else:
+            Clock.schedule_once(partial(self.snackbar_show, self.loc.get("Error while loading tracks")))
             return False
     
     def playlist_load(self, youtube=False):
@@ -390,6 +380,7 @@ class Neodeemer(MDApp):
             label_playlist_info.text = "[b]" + tracks[0]["playlist_name"] + "[/b] - [b]" + str(len(tracks)) + "[/b]" + self.loc.get(" songs")
             return True
         else:
+            Clock.schedule_once(partial(self.snackbar_show, self.loc.get("Error while loading playlist")))
             return False
     
     def playlist_show(self, page=0, youtube=False, *args):
@@ -449,7 +440,7 @@ class Neodeemer(MDApp):
         else:
             mdlist_tracks = self.screen_cur.ids.mdlist_tracks
         self.mdlist_set_mode(mdlist_tracks, 0)
-        for i in range(1, 6):
+        for i in range(1, self.download_threads_count + 1):
             if not globals()[f"download_tracks_{i}"].is_alive():
                 globals()[f"download_tracks_{i}"] = Thread(target=self.download_tracks_from_queue, name=f"download_tracks_{i}")
                 globals()[f"download_tracks_{i}"].start()
@@ -461,11 +452,11 @@ class Neodeemer(MDApp):
     def download_tracks_from_queue(self):
         while self.download_queue_info["position"] != len(self.download_queue):
             for track in self.download_queue:
-                sleep(randint(0, 20) / 100)
+                sleep(randint(0, self.download_threads_count * 4) / 100)
                 if not track["locked"]:
                     track["locked"] = True
-                    if any(state == track["state"] for state in [TrackStates.UNAVAILABLE, TrackStates.UNKNOWN, TrackStates.FOUND, TrackStates.SAVED]):
-                        Download(track, self.s, self.download_queue_info).download_track()
+                    if any(state == track["state"] for state in [TrackStates.UNKNOWN, TrackStates.FOUND, TrackStates.SAVED]):
+                        Download(track, self.s, self.download_queue_info, self.save_lyrics, self.synchronized_lyrics).download_track()
                     track["locked"] = False
                 else:
                     continue
@@ -486,12 +477,14 @@ class Neodeemer(MDApp):
                 if self.sound != None:
                     self.sound.stop()
                     self.sound_prev_widget.children[0].icon = "play-circle-outline"
-                if stream:
+                if stream and track_dict_temp["state"] != TrackStates.COMPLETED:
                     try:
                         if track_dict_temp["state"] == TrackStates.UNKNOWN and track_dict_temp["video_id"] == None:
                             self.s.track_find_video_id(track_dict_temp)
                             track_dict["video_id"] = track_dict_temp["video_id"]
                             track_dict["state"] = track_dict_temp["state"]
+                        if not check_mp3_available(track_dict):
+                            raise
                         file_path = "https://neodeemer.vorpal.tk/mp3.php?video_id=" + track_dict_temp["video_id"] + ".mp3"
                         self.sound = SoundLoader.load(file_path)
                         self.sound.play()
@@ -513,12 +506,7 @@ class Neodeemer(MDApp):
                                 self.s.track_find_video_id(track_dict_temp)
                             open_url("https://youtu.be/" + track_dict_temp["video_id"], platform)
                         else:
-                            download_queue_info_temp = {
-                                "position": 0,
-                                "downloaded_b": 0,
-                                "total_b": 0
-                            }
-                            Download(track_dict_temp, self.s, download_queue_info_temp, False).download_track()
+                            Download(track_dict_temp, self.s, None, False).download_track()
                         track_dict["video_id"] = track_dict_temp["video_id"]
                         track_dict["state"] = track_dict_temp["state"]
                 if track_dict_temp["forcedmp3"]:
@@ -631,9 +619,15 @@ class Neodeemer(MDApp):
         self.toolbar.left_action_items = left_action_items
     
     def mdlist_add_page_controls(self, mdlist):
+        if self.screen_cur.name == "SpotifyScreen":
+            view_cur = self.tab_cur
+        else:
+            view_cur = self.screen_cur
         line = OneLineAvatarIconListItem()
-        line.add_widget(IconLeftWidget(icon="arrow-left-bold", on_press=lambda x:self.tracks_change_page(False)))
-        line.add_widget(IconRightWidget(icon="arrow-right-bold", on_press=lambda x:self.tracks_change_page()))
+        if view_cur.page > 1:
+            line.add_widget(IconLeftWidget(icon="arrow-left-bold", on_press=lambda x:self.tracks_change_page(False)))
+        if view_cur.page < 10:
+            line.add_widget(IconRightWidget(icon="arrow-right-bold", on_press=lambda x:self.tracks_change_page()))
         mdlist.add_widget(line)
     
     def tracks_change_page(self, next=True):
@@ -686,9 +680,11 @@ class Neodeemer(MDApp):
         if show:
             tracks_actions.opacity = 1
             tracks_actions.height = 40
+            tracks_actions.pos_hint = {"center_x": .5}
         else:
             tracks_actions.opacity = 0
             tracks_actions.height = 0
+            tracks_actions.pos_hint = {"center_x": -1}
     
     def playlist_last_menu_show(self, youtube=False):
         if youtube:
@@ -722,7 +718,7 @@ class Neodeemer(MDApp):
         self.settings_save()
 
     def create_subfolders_change(self):
-        self.create_subfolders = self.check_create_subfolders.active
+        self.create_subfolders = self.switch_create_subfolders.active
         self.settings_save()
     
     def music_folder_path_change(self):
@@ -736,6 +732,16 @@ class Neodeemer(MDApp):
     
     def file_manager_close(self, *args):
         self.file_manager.close()
+    
+    def save_lyrics_change(self):
+        self.save_lyrics = self.switch_save_lyrics.active
+        self.options_lyrics.height = int(self.save_lyrics) * 40
+        self.options_lyrics.opacity = int(self.save_lyrics)
+        self.settings_save()
+
+    def lyrics_type_change(self):
+        self.synchronized_lyrics = self.switch_lyrics_type.active
+        self.settings_save()
     
     def theme_toggle(self):
         if self.theme_cls.theme_style == "Light":
@@ -771,6 +777,10 @@ class Neodeemer(MDApp):
                 if "format_mp3" in data:
                     self.format_mp3 = data["format_mp3"]
                 self.create_subfolders = data["create_subfolders"]
+                if "save_lyrics" in data:
+                    self.save_lyrics = data["save_lyrics"]
+                if "synchronized_lyrics" in data:
+                    self.synchronized_lyrics = data["synchronized_lyrics"]
                 self.theme_cls.theme_style = data["theme"]
                 self.loc.set_lang(data["lang"])
                 if "playlist_last" in data:
@@ -784,6 +794,8 @@ class Neodeemer(MDApp):
                 "music_folder_path": self.music_folder_path,
                 "format_mp3": self.format_mp3,
                 "create_subfolders": self.create_subfolders,
+                "save_lyrics": self.save_lyrics,
+                "synchronized_lyrics": self.synchronized_lyrics,
                 "theme": self.theme_cls.theme_style,
                 "lang": self.loc.get_lang(),
                 "playlist_last": self.playlist_last
@@ -799,8 +811,22 @@ if __name__ == "__main__":
     os.environ["KIVY_AUDIO"] = "ffpyplayer"
     if hasattr(sys, "_MEIPASS"):
         resource_add_path(os.path.join(sys._MEIPASS))
-        if platform == "win":
-            import ctypes
-            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 6)
     app = Neodeemer()
+    if platform == "android":
+        from android.storage import primary_external_storage_path
+        from android.permissions import Permission, request_permissions
+        settings_folder_path = os.path.join(primary_external_storage_path(), app.loc.TITLE)
+        request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS])
+    else:
+        settings_folder_path = app.user_data_dir
+    if not os.path.exists(settings_folder_path):
+        try:
+            os.makedirs(settings_folder_path)
+        except OSError:
+            pass
+    app.settings_file_path = os.path.join(settings_folder_path, "settings.json")
+    try:
+        app.settings_load()
+    except OSError:
+        pass
     app.run()

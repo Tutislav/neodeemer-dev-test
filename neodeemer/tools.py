@@ -30,7 +30,7 @@ def norm(text, keepdiacritic=False, keepcase=False):
     return text
 
 def clean_track_name(track_name):
-    endings = ["original", "from", "remastered", "remake", "remaster", "music", "radio", "mix"]
+    endings = ["original", "from", "remastered", "remake", "remaster", "music", "radio", "mix", "featuring", "new version"]
     track_name = track_name.lower()
     for ending in endings:
         if " - " in track_name and ending in track_name:
@@ -66,6 +66,7 @@ def track_file_state(track_dict):
     file_path = None
     if os.path.exists(track_dict["file_path"]) and os.path.getsize(track_dict["file_path"]) > 0:
         file_path = track_dict["file_path"]
+        track_dict["forcedmp3"] = False
     elif os.path.exists(track_dict["file_path2"]) and os.path.getsize(track_dict["file_path2"]) > 0:
         file_path = track_dict["file_path2"]
         track_dict["forcedmp3"] = True
@@ -81,7 +82,7 @@ def track_file_state(track_dict):
             else:
                 state = TrackStates.SAVED
         except:
-            state = TrackStates.SAVED
+            state = TrackStates.UNKNOWN
     return state
 
 def submit_bug(track_dict):
@@ -252,3 +253,8 @@ def check_update_available(current_version):
     data = urldata.json()
     new_version = data[0]["tag_name"]
     return new_version != current_version
+
+def check_mp3_available(track_dict):
+    url = "https://neodeemer.vorpal.tk/mp3.php?video_id=" + track_dict["video_id"] + "&info=1"
+    urldata = requests.get(url)
+    return bool(int(urldata.text))
