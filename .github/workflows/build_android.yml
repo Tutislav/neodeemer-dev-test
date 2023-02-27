@@ -54,7 +54,7 @@ jobs:
               cd ../../../
             done;
             cd /github/workspace/neodeemer/;
-            pip3 install sh==1.14.2; buildozer android debug
+            buildozer android debug
           workdir: neodeemer
 
       - name: Upload a Build Artifact
